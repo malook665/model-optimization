@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
+import tensorflow as tf
 
 from tensorflow.python import keras
 from tensorflow.python.keras import backend as K
@@ -138,7 +139,11 @@ class TFLiteQuantizeRegistryTest(test.TestCase, _TestHelper):
     quantize_provider.set_quantize_weights(layer, [quantize_kernel])
     quantize_provider.set_quantize_activations(layer, [quantize_activation])
 
-    self.assertEqual(layer.kernel, quantize_kernel)
+    # TODO(tfmot): branch on eager mode also.
+    if tf.__version__[0] == '1':
+      self.assertEqual(layer.kernel, quantize_kernel)
+    else:
+      self.assertAllEqual(layer.kernel.numpy(), quantize_kernel.numpy())
     self.assertEqual(layer.activation, quantize_activation)
 
   def testReturnsProvider_LayerWithResultQuantizer(self):
@@ -232,7 +237,11 @@ class TFLiteQuantizeProviderTest(test.TestCase, _TestHelper):
         ['kernel'], ['activation'], False)
     quantize_provider.set_quantize_weights(layer, [quantize_kernel])
 
-    self.assertEqual(layer.kernel, quantize_kernel)
+    # TODO(tfmot): branch on eager mode also.
+    if tf.__version__[0] == '1':
+      self.assertEqual(layer.kernel, quantize_kernel)
+    else:
+      self.assertAllEqual(layer.kernel.numpy(), quantize_kernel.numpy())
 
   def testSetsQuantizeActivations(self):
     layer = self._simple_dense_layer()

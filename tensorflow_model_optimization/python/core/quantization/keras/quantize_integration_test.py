@@ -91,13 +91,10 @@ class QuantizeIntegrationTest(test.TestCase, parameterized.TestCase):
     annotated = quantize_annotate(model)
     quantized_model = quantize_apply(annotated)
 
-    _, keras_file = tempfile.mkstemp('.h5')
     _, tflite_file = tempfile.mkstemp('.h5')
 
-    keras.models.save_model(quantized_model, keras_file)
-
     with quantize.quantize_scope():
-      utils.convert_keras_to_tflite(keras_file, tflite_file)
+      utils.convert_keras_to_tflite(quantized_model, tflite_file)
 
 
 if __name__ == '__main__':
